@@ -13,7 +13,10 @@ int main (int argc, char* argv[]) {
   }
   fs::path path{argv[1]};
   std:: cout << path.string() << std::endl
-             << path.extension().string() << std::endl;
+             << "filename: " << path.filename().string() << std::endl
+             << "relative_path: " << path.relative_path().string() << std::endl
+             << "parent_path: " << path.parent_path().string() << std::endl
+             << "extension: " << path.extension().string() << std::endl;
   
   return 0;
 }
