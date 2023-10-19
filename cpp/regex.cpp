@@ -32,13 +32,14 @@ static bool VersionCmp(const string& v1, const string& v2)
   return false;
 }
 
-int main(int argc, char **argv) {
+/*int main(int argc, char **argv) {
   string input{argv[1]};
   string input2{argv[2]};
   bool res = VersionCmp(input, input2);
   std::cout << "res: " << (res ? "true" : "false") << endl;
   return 0;
 }
+*/
 
 
 /*void sql_test(const string& input) {
@@ -76,3 +77,33 @@ int main(int argc, char **argv) {
 
 }
 */
+ 
+int main()
+{
+    std::regex specialChars { R"([-[\]{}()*+?.,\^$|#\s])" };
+    const vector<string> target_names = {"20140726-142907.JPG", "IMG_20140726_142907_11.JPG"}; // input
+    // Simple regular expression matching
+    const std::string db_names[] = {"20140726-142907.JPG", "IMG_20140726_142907.JPG", "+.jpeg", "+.jpeg"}; // db
+
+    for (const auto& dbname : db_names) {
+      cout << "Check db name:" << dbname << endl;
+      boost::filesystem::path db_path{dbname};
+      const std::string raw_filename = db_path.stem().string();
+      const std::string filename = std::regex_replace(raw_filename, specialChars, R"(\$&)");
+      const std::string ext_path = db_path.extension().string();
+      const std::string ext = ext_path.empty() ? ext_path : ext_path.substr(1);
+      std::for_each(target_names.begin(), target_names.end(), [&dbname, &filename, &ext](const auto& name) {
+          const std::string pattern = filename + "_[0-9]+\\." + ext;
+          const std::regex txt_regex (pattern);
+          std::smatch match;
+          cout << "  target name: " << name << endl;
+          cout << "  pattern: " << pattern << endl;
+          if (dbname == name || std::regex_match(name, match, txt_regex)) {
+            cout << "  match: " << name << endl;
+            for (size_t i = 0; i < match.size(); ++i) {
+              cout << "  match: " << match[i].str() << endl;
+            }
+          }
+      });
+    }
+}
